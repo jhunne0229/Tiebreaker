@@ -15,6 +15,7 @@
 | [03_PHASES.md](./03_PHASES.md) | 단계별 계획 (MVP / 확장 / 고도화) | Phase 시작할 때 |
 | [04_PROJECT_SPEC.md](./04_PROJECT_SPEC.md) | 기술 스택, AI 행동 규칙 | AI에게 코드 시킬 때마다 |
 | [05_DECISIONS.md](./05_DECISIONS.md) | 미결 사항 15건의 확정안 | 구현 중 의사결정 막힐 때 |
+| [06_PHASE2_PRD.md](./06_PHASE2_PRD.md) | Phase 2 상세 PRD (분석 5종 + 추천 점수 + 경향성 + 회고/알림 + PWA) | Phase 2 시작할 때 |
 
 ---
 
@@ -30,11 +31,17 @@
 
 ## 다음 단계
 
-Phase 1을 시작하려면:
-1. Anthropic Console에서 API 키 발급
-2. Supabase 프로젝트 생성
-3. Google Cloud Console에서 OAuth 클라이언트 발급
-4. [03_PHASES.md](./03_PHASES.md)의 "Phase 1 시작 프롬프트"를 AI에게 그대로 붙여넣기
+**Phase 1: ✅ 완료 (2026-05-08 프로덕션 배포)** — https://tiebreaker-weld.vercel.app
+
+**Phase 2 진행 상황:**
+1. ✅ [06_PHASE2_PRD.md](./06_PHASE2_PRD.md) 작성 + 미결 3건 확정 (2026-05-09 — AI throttle/이메일/OG)
+2. ✅ Supabase 마이그레이션 0003 작성 + 적용 (2026-05-09)
+3. ✅ `src/types/database.ts`에 Phase 2 타입 추가 (2026-05-09)
+4. ⏳ 슬라이스 A 시작 — 분석 탭 2종(데카르트 4분면 + 드러커 5질문)
+5. ⏳ 슬라이스 B — 추천 점수 + 톤 재정의(logical/emotional/냉철 갭)
+6. ⏳ 슬라이스 C — 사용자 경향성(온보딩 자가 평가 + EWMA)
+7. ⏳ 슬라이스 D — 회고 + Web Push/Resend 이메일 알림
+8. ⏳ 슬라이스 E — 공유 링크 + 비교 기준 템플릿 + PWA
 
 ---
 
