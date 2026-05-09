@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { applyTendencyUpdate } from "@/lib/tendency/ewma";
 
 export const runtime = "nodejs";
 
@@ -50,6 +51,22 @@ export async function POST(
   if (error) {
     return NextResponse.json({ error: "저장하지 못했어요." }, { status: 500 });
   }
+
+  // final_choice 변경 시 EWMA 갱신 (06_PHASE2_PRD.md §2.3.3).
+  // 응답 후 비동기 — 실패해도 finalize 결과는 유지.
+  if (finalChoiceId) {
+    after(async () => {
+      try {
+        const bg = await createClient();
+        await applyTendencyUpdate(bg, user.id, decisionId, {
+          finalChoiceChanged: true,
+        });
+      } catch (e) {
+        console.error("[finalize] after() ewma failed", e);
+      }
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }
 

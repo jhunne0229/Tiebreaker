@@ -1,0 +1,44 @@
+{
+  "name": "타이브레이커 — 결정 못 내릴 때 AI가 도와주는 의사결정 도우미",
+  "short_name": "타이브레이커",
+  "description": "장단점 · 비교표 · SWOT을 한 번에 받아보고, 결정을 히스토리로 누적하세요.",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#18181b",
+  "categories": ["productivity", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "새 결정",
+      "short_name": "새 결정",
+      "description": "새 결정 작성을 시작합니다",
+      "url": "/decisions/new",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "히스토리",
+      "short_name": "히스토리",
+      "description": "지난 결정 모아보기",
+      "url": "/",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

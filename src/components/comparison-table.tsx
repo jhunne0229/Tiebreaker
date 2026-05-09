@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { TemplateLoader } from "@/components/template-loader";
 import type { Criteria, DecisionOption, Score } from "@/types/domain";
 import { rankOptions } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -130,6 +131,13 @@ export function ComparisonTable({
           아직 비교 기준이 없어요. AI가 분석하면 자동으로 4-6개 기준이 생기거나,
           직접 추가해보세요.
         </p>
+        <TemplateLoader
+          decisionId={decisionId}
+          currentCriteria={criteria}
+          onLoaded={(added) =>
+            onLocalUpdate({ criteria: [...criteria, ...added] })
+          }
+        />
         <AddCriteriaInline
           value={newName}
           setValue={setNewName}
@@ -288,6 +296,13 @@ export function ComparisonTable({
         </div>
       </div>
 
+      <TemplateLoader
+        decisionId={decisionId}
+        currentCriteria={criteria}
+        onLoaded={(added) =>
+          onLocalUpdate({ criteria: [...criteria, ...added] })
+        }
+      />
       <AddCriteriaInline
         value={newName}
         setValue={setNewName}

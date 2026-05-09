@@ -9,12 +9,22 @@ import { ToneSelector } from "@/components/tone-selector";
 import { ProsConsList } from "@/components/pros-cons-list";
 import { ComparisonTable } from "@/components/comparison-table";
 import { SwotGrid } from "@/components/swot-grid";
+import { CartesianQuadrants } from "@/components/cartesian-quadrants";
+import { DruckerQuestionsForm } from "@/components/drucker-questions";
+import { OptionScoreCards } from "@/components/option-score-cards";
+import { DivergenceBanner } from "@/components/divergence-banner";
+import { DivergencePanel } from "@/components/divergence-panel";
 import { FinalDecision } from "@/components/final-decision";
+import { ReviewSection } from "@/components/review-section";
 import type {
+  CartesianItem,
   Criteria,
   Decision,
   DecisionOption,
+  DruckerAnswer,
   ProsConItem,
+  RecommendationScore,
+  Review,
   Score,
   SwotItem,
 } from "@/types/domain";
@@ -27,6 +37,10 @@ interface Props {
   scores: Score[];
   prosCons: ProsConItem[];
   swot: SwotItem[];
+  cartesian: CartesianItem[];
+  drucker: DruckerAnswer[];
+  recommendationScores: RecommendationScore[];
+  reviews: Review[];
 }
 
 type Status =
@@ -39,6 +53,9 @@ export function DecisionView(initial: Props) {
   const [tone, setTone] = useState<DecisionTone>(initial.decision.tone);
   const [criteria, setCriteria] = useState(initial.criteria);
   const [scores, setScores] = useState(initial.scores);
+  const [recommendationScores, setRecommendationScores] = useState(
+    initial.recommendationScores,
+  );
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const abortRef = useRef<AbortController | null>(null);
   const [_, startTransition] = useTransition();
@@ -229,12 +246,50 @@ export function DecisionView(initial: Props) {
         </div>
       </div>
 
-      {/* 분석 결과 탭 */}
+      {/* 갭 배너 — 감성 모드에서 logical/emotional 차이 큰 옵션 알림 (PRD §2.2.0) */}
+      <DivergenceBanner
+        options={initial.options}
+        scores={recommendationScores}
+        tone={tone}
+        onShowBlunt={() => setTone("blunt")}
+      />
+
+      {/* 옵션별 추천 점수 카드 (Phase 2 §2.2) */}
+      <OptionScoreCards
+        decisionId={initial.decision.id}
+        options={initial.options}
+        initialScores={recommendationScores}
+        tone={tone}
+        onScoresChange={setRecommendationScores}
+      />
+
+      {/* 냉철 갭 분석 패널 — tone=blunt 일 때 lazy 로드 (PRD §5.5) */}
+      {tone === "blunt" && (
+        <DivergencePanel
+          decisionId={initial.decision.id}
+          options={initial.options}
+          initialCache={initial.decision.divergence_cache}
+        />
+      )}
+
+      {/* 분석 결과 탭 (Phase 2: 5종) */}
       <Tabs defaultValue="pros-cons" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="pros-cons">장단점</TabsTrigger>
-          <TabsTrigger value="comparison">비교표</TabsTrigger>
-          <TabsTrigger value="swot">SWOT</TabsTrigger>
+        <TabsList className="flex w-full overflow-x-auto sm:grid sm:grid-cols-5">
+          <TabsTrigger value="pros-cons" className="flex-1">
+            장단점
+          </TabsTrigger>
+          <TabsTrigger value="comparison" className="flex-1">
+            비교표
+          </TabsTrigger>
+          <TabsTrigger value="swot" className="flex-1">
+            SWOT
+          </TabsTrigger>
+          <TabsTrigger value="cartesian" className="flex-1">
+            4분면
+          </TabsTrigger>
+          <TabsTrigger value="drucker" className="flex-1">
+            드러커 5질문
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="pros-cons">
           <ProsConsList items={visibleProsCons} options={initial.options} />
@@ -254,6 +309,18 @@ export function DecisionView(initial: Props) {
         <TabsContent value="swot">
           <SwotGrid items={visibleSwot} options={initial.options} />
         </TabsContent>
+        <TabsContent value="cartesian">
+          <CartesianQuadrants
+            decisionId={initial.decision.id}
+            initialItems={initial.cartesian}
+          />
+        </TabsContent>
+        <TabsContent value="drucker">
+          <DruckerQuestionsForm
+            decisionId={initial.decision.id}
+            initialAnswers={initial.drucker}
+          />
+        </TabsContent>
       </Tabs>
 
       {/* 최종 결정 */}
@@ -264,6 +331,14 @@ export function DecisionView(initial: Props) {
         initialNote={initial.decision.final_note}
         decided={initial.decision.status === "decided"}
       />
+
+      {/* 회고 — 결정 완료 후 노출 (PRD §2.4) */}
+      {initial.decision.status === "decided" && (
+        <ReviewSection
+          decisionId={initial.decision.id}
+          initialReviews={initial.reviews}
+        />
+      )}
     </div>
   );
 }

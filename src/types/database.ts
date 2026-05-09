@@ -30,10 +30,13 @@ export type NotificationChannel = "email" | "push" | "both" | "off";
 // JSONB 페이로드 형태 (마이그레이션 0003 §3.1, §3.2 참조)
 
 // Option.ai_labels — 옵션 라벨링 결과 캐시 (5.3 프롬프트 출력)
+// text_hash, labeled_at 은 캐시 무효화용 (option-labels.ts).
 export interface OptionAiLabels {
-  risk: "predictable" | "uncertain";
-  change: "status_quo" | "change";
-  time: "short" | "long";
+  risk_label: "predictable" | "uncertain";
+  change_label: "status_quo" | "change";
+  time_label: "short" | "long";
+  text_hash?: string;
+  labeled_at?: string;
 }
 
 // RecommendationScore.reasoning — 5개 시그널의 raw score (산정 근거)
@@ -46,8 +49,14 @@ export interface ScoreReasoning {
 }
 
 // Decision.divergence_cache — 냉철 갭 설명 캐시 (5.5 프롬프트 출력)
+// items 는 갭이 큰 옵션별 1세트. 갭이 없으면 items 빈 배열, summary 만 채워짐.
 export interface DivergenceCache {
-  explanation: string;
+  summary: string;
+  items: Array<{
+    option_id: string;
+    cause: string;
+    self_check: string;
+  }>;
   diverging_option_ids: string[];
   generated_at: string;
 }
@@ -68,6 +77,7 @@ export interface DecisionShareViewRow {
   context: string | null;
   type: DecisionType;
   status: DecisionStatus;
+  tone: DecisionTone;
   final_choice_id: string | null;
   share_token: string;
   share_og_enabled: boolean;
@@ -116,6 +126,7 @@ export interface Database {
           share_token: string | null;
           share_og_enabled: boolean;
           divergence_cache: DivergenceCache | null;
+          last_review_alert_at: string | null;
         };
         Insert: {
           id?: string;
@@ -132,6 +143,7 @@ export interface Database {
           share_token?: string | null;
           share_og_enabled?: boolean;
           divergence_cache?: DivergenceCache | null;
+          last_review_alert_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["decisions"]["Insert"]>;
         Relationships: [];
@@ -426,6 +438,28 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["criteria_templates"]["Insert"]>;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          user_agent?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Insert"]>;
         Relationships: [];
       };
     };

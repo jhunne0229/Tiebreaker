@@ -1,7 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { refreshOptionLabels } from "@/lib/option-labels";
+import { applyTendencyUpdate } from "@/lib/tendency/ewma";
 import type { DecisionType } from "@/types/database";
 
 const DECISION_TYPES: readonly DecisionType[] = [
@@ -106,6 +109,20 @@ export async function createDecisionAction(
       error: "옵션 저장에 실패했어요. 잠시 후 다시 시도해주세요.",
     };
   }
+
+  // 라벨링 + EWMA 경향성 갱신은 응답 후 비동기 실행 (06_PHASE2_PRD.md §5.3, §2.3.3, §8 lazy throttle).
+  // 실패해도 결정 자체는 유지. 누락된 라벨은 다음 결정 갱신 사이클에 lazy 보충.
+  after(async () => {
+    try {
+      const bg = await createClient();
+      await refreshOptionLabels(bg, decision.id, context);
+      await applyTendencyUpdate(bg, user.id, decision.id, {
+        decisionInserted: true,
+      });
+    } catch (e) {
+      console.error("[createDecisionAction] after() background failed", e);
+    }
+  });
 
   redirect(`/decisions/${decision.id}`);
 }

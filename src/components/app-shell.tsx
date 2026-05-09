@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, LogOut } from "lucide-react";
+import { Plus, LogOut, Settings } from "lucide-react";
 
 interface AppShellProps {
   user?: { name: string | null; email: string; avatar_url: string | null };
@@ -24,15 +24,24 @@ export function AppShell({ user, children }: AppShellProps) {
               <span className="hidden sm:inline">새 결정</span>
             </Link>
             {user && (
-              <form action="/auth/signout" method="post">
-                <button
-                  type="submit"
-                  aria-label="로그아웃"
+              <>
+                <Link
+                  href="/settings"
+                  aria-label="설정"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
                 >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </form>
+                  <Settings className="h-4 w-4" />
+                </Link>
+                <form action="/auth/signout" method="post">
+                  <button
+                    type="submit"
+                    aria-label="로그아웃"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </form>
+              </>
             )}
           </nav>
         </div>

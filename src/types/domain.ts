@@ -11,6 +11,11 @@ export type Criteria = Database["public"]["Tables"]["criteria"]["Row"];
 export type Score = Database["public"]["Tables"]["scores"]["Row"];
 export type ProsConItem = Database["public"]["Tables"]["pros_cons_items"]["Row"];
 export type SwotItem = Database["public"]["Tables"]["swot_items"]["Row"];
+export type CartesianItem = Database["public"]["Tables"]["cartesian_items"]["Row"];
+export type DruckerAnswer = Database["public"]["Tables"]["drucker_answers"]["Row"];
+export type RecommendationScore = Database["public"]["Tables"]["recommendation_scores"]["Row"];
+export type UserTendency = Database["public"]["Tables"]["user_tendencies"]["Row"];
+export type Review = Database["public"]["Tables"]["reviews"]["Row"];
 
 export interface DecisionWithDetails extends Decision {
   options: DecisionOption[];

@@ -304,7 +304,9 @@ export async function POST(request: NextRequest) {
       }
 
       // ── 결과 저장 ────────────────────────────────────
-      // PROJECT_SPEC: 누적 (덮어쓰기 X) — 이전 분석 결과는 유지
+      // 같은 (decision, tone)으로 재분석할 때 항목이 중복으로 쌓이는 것을 막기 위해
+      // 같은 톤의 AI 생성 항목만 먼저 비우고 새로 INSERT 한다. 사용자가 직접 추가한
+      // 항목(ai_generated=false)은 유지된다.
       const validOptionIds = new Set(options.map((o) => o.id));
 
       // pros_cons
@@ -324,6 +326,12 @@ export async function POST(request: NextRequest) {
           ai_generated: true,
           tone,
         }));
+      await supabase
+        .from("pros_cons_items")
+        .delete()
+        .eq("decision_id", decisionId)
+        .eq("tone", tone)
+        .eq("ai_generated", true);
       if (pcRows.length > 0) {
         await supabase.from("pros_cons_items").insert(pcRows);
       }
@@ -345,6 +353,12 @@ export async function POST(request: NextRequest) {
           ai_generated: true,
           tone,
         }));
+      await supabase
+        .from("swot_items")
+        .delete()
+        .eq("decision_id", decisionId)
+        .eq("tone", tone)
+        .eq("ai_generated", true);
       if (swotRows.length > 0) {
         await supabase.from("swot_items").insert(swotRows);
       }
