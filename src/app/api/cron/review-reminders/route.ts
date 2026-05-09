@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createServiceClient();
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://tiebreaker.vercel.app";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://tiebreaker-weld.vercel.app";
   const now = Date.now();
 
   const summary: ResultSummary = {
