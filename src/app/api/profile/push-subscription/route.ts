@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
   );
 
   if (error) {
+    console.error("[push-subscription] upsert failed", error);
     return NextResponse.json(
       { error: "구독을 저장하지 못했어요." },
       { status: 500 },
@@ -82,6 +83,7 @@ export async function DELETE(request: NextRequest) {
     .eq("endpoint", endpoint);
 
   if (error) {
+    console.error("[push-subscription] delete failed", error);
     return NextResponse.json(
       { error: "구독을 해제하지 못했어요." },
       { status: 500 },
