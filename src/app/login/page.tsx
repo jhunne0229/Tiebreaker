@@ -1,5 +1,8 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { LoginButton } from "./login-button";
+import { InAppGuide } from "@/components/in-app-guide";
+import { isInAppBrowser } from "@/lib/in-app-browser";
 
 export default async function LoginPage({
   searchParams,
@@ -7,6 +10,17 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const { next, error } = await searchParams;
+
+  // 카톡/페북 등 인앱 웹뷰에서는 Google OAuth 가 막혀 안내 화면으로 분기.
+  const ua = (await headers()).get("user-agent");
+  if (isInAppBrowser(ua)) {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ?? "https://tiebreaker-weld.vercel.app";
+    const target = next
+      ? `${baseUrl}/login?next=${encodeURIComponent(next)}`
+      : `${baseUrl}/login`;
+    return <InAppGuide url={target} />;
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-muted px-4">
